@@ -3,11 +3,19 @@
     <div class="flex">
       <SideBar />
       <div class="inventory">
-        <div @drop="" v-for="item in items" class="inventory__elem droppable">
+        <div
+          @drop="onDrop($event)"
+          v-for="item in items"
+          :key="item?.id"
+          class="inventory__elem droppable"
+          @dragover.prevent
+          @dragenter.prevent
+        >
           <div
-            @dragstart="onDrug($event)"
-            v-if="item.img"
+            @dragstart="onDrug($event, item, items)"
+            v-if="item?.img"
             class="conteiner draggable"
+            draggable="true"
           >
             <img :src="item.img" alt="item-image" />
             <div v-if="item.count" class="inventory__count">
@@ -29,48 +37,66 @@ import { ref } from 'vue';
 export default {
   data() {
     return {
-      items: [
-        { id: 1, img: require('../src/sourse/item1.png'), count: 4 },
-        { id: 2, img: require('../src/sourse/item2.png'), count: 2 },
-        { id: 3, img: require('../src/sourse/item3.png'), count: 5 },
-        { id: 4 },
-        { id: 5 },
-        { id: 6 },
-        { id: 7 },
-        { id: 8 },
-        { id: 9 },
-        { id: 10 },
-        { id: 11 },
-        { id: 12 },
-        { id: 13 },
-        { id: 14 },
-        { id: 15 },
-        { id: 16 },
-        { id: 17 },
-        { id: 18 },
-        { id: 19 },
-        { id: 20 },
-        { id: 21 },
-        { id: 22 },
-        { id: 23 },
-        { id: 24 },
-        { id: 25 },
-      ],
+      fullItemOpen: false,
     };
   },
+
   components: { SideBar, GhostElement },
-  /* setup() {
-    const items = ref([]);
 
-    function onDrug(event, item) {}
-    function onDrop(event, id) {}
+  setup() {
+    const items = ref([
+      { id: 1, img: require('../src/sourse/item1.png'), count: 4 },
+      { id: 2, img: require('../src/sourse/item2.png'), count: 2 },
+      { id: 3, img: require('../src/sourse/item3.png'), count: 5 },
+      { id: 4 },
+      { id: 5 },
+      { id: 6 },
+      { id: 7 },
+      { id: 8 },
+      { id: 9 },
+      { id: 10 },
+      { id: 11 },
+      { id: 12 },
+      { id: 13 },
+      { id: 14 },
+      { id: 15 },
+      { id: 16 },
+      { id: 17 },
+      { id: 18 },
+      { id: 19 },
+      { id: 20 },
+      { id: 21 },
+      { id: 22 },
+      { id: 23 },
+      { id: 24 },
+      { id: 25 },
+    ]);
 
+    function onDrug(event, item) {
+      event.dataTransfer.dropEffect = 'move';
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData('itemId', item.id.toString());
+    }
+    function onDrop(event) {
+      const itemId = parseInt(event.dataTransfer.getData('itemId'));
+      const dropId = event.srcElement.__vnode.key;
+      if (itemId != dropId) {
+        [items.value[itemId - 1], items.value[dropId - 1]] = [
+          items.value[dropId - 1],
+          items.value[itemId - 1],
+        ];
+        [items.value[itemId - 1].id, items.value[dropId - 1].id] = [
+          items.value[dropId - 1].id,
+          items.value[itemId - 1].id,
+        ];
+      }
+    }
     return {
       items,
       onDrug,
       onDrop,
     };
-  }, */
+  },
 };
 </script>
 
@@ -133,6 +159,20 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
   }
 }
 </style>
+
+<!-- РАБОЧИЙ
+
+if (itemId != dropId) {
+        [items.value[itemId - 1], items.value[dropId - 1]] = [
+          items.value[dropId - 1],
+          items.value[itemId - 1],
+        ];
+        [items.value[itemId - 1].id, items.value[dropId - 1].id] = [
+          items.value[dropId - 1].id,
+          items.value[itemId - 1].id,
+        ];
+      } -->
