@@ -10,6 +10,7 @@
           class="inventory__elem droppable"
           @dragover.prevent
           @dragenter.prevent
+          @click="openRightMenu(item)"
         >
           <div
             @dragstart="onDrug($event, item, items)"
@@ -23,15 +24,25 @@
             </div>
           </div>
         </div>
-        <div class="right-menu">
+        <ModalItem
+          @closeModal="closeModal"
+          @delete="deleteCount"
+          :openModalWindow="openModalWindow"
+        />
+        <div
+          v-if="fullItemOpen"
+          :class="{ openRight: fullItemOpen }"
+          class="right-menu"
+        >
           <div class="cross-div">
             <img
               class="cross"
               src="../src/sourse/icons/cross.svg"
               alt="image"
+              @click="fullClose"
             />
           </div>
-          <img src="../src/sourse/item1.png" alt="image" />
+          <img :src="ClickElement?.img" alt="image" />
           <div class="line"></div>
           <h2>Lorem ipsum, dolor.</h2>
           <p>
@@ -39,7 +50,7 @@
             error illo proiivident constetur porro pariatur suutreyh.
           </p>
           <div class="line"></div>
-          <button>Удалить предмет</button>
+          <button @click="openModal">Удалить предмет</button>
         </div>
       </div>
     </div>
@@ -50,16 +61,44 @@
 <script>
 import SideBar from './components/SideBar.vue';
 import GhostElement from './components/GhostElement.vue';
+import ModalItem from './components/UI/ModalItem.vue';
 import { ref } from 'vue';
 
 export default {
   data() {
     return {
       fullItemOpen: false,
+      ClickElement: {},
+      openModalWindow: false,
     };
   },
 
-  components: { SideBar, GhostElement },
+  components: { SideBar, GhostElement, ModalItem },
+  methods: {
+    openRightMenu(item) {
+      this.fullItemOpen = true;
+      this.ClickElement = item;
+    },
+    fullClose() {
+      this.fullItemOpen = false;
+      this.openModalWindow = false;
+    },
+    openModal() {
+      this.openModalWindow = true;
+    },
+    closeModal() {
+      this.openModalWindow = false;
+    },
+    deleteCount(count) {
+      this.items.forEach((el, i) => {
+        if (el === this.ClickElement) {
+          this.items[i].count = this.items[i].count - count;
+        }
+      });
+      this.openModalWindow = false;
+      this.fullItemOpen = false;
+    },
+  },
 
   setup() {
     const items = ref([
@@ -106,6 +145,7 @@ export default {
         items.value[dropId - 1].id,
         items.value[itemId - 1].id,
       ];
+      localStorage.items = JSON.stringify(items.value);
     }
     return {
       items,
@@ -113,13 +153,7 @@ export default {
       onDrop,
     };
   },
-  watch: {
-    items(newItems) {
-      console.log(newItems);
-    },
-  },
   mounted() {
-    console.log(localStorage);
     if (localStorage.items) {
       this.items = JSON.parse(localStorage.items);
     }
@@ -248,6 +282,17 @@ export default {
     font-family: 'Inter';
     font-size: 14px;
     color: #ffffff;
+  }
+}
+.openRight {
+  animation: open 1s ease-in-out both;
+}
+@keyframes open {
+  0% {
+    right: -250px;
+  }
+  100% {
+    right: 0;
   }
 }
 </style>
