@@ -4,13 +4,13 @@
       <SideBar />
       <div class="inventory">
         <div
-          @drop="onDrop($event)"
           v-for="item in items"
           :key="item?.id"
           class="inventory__elem droppable"
+          @drop="onDrop($event)"
           @dragover.prevent
           @dragenter.prevent
-          @click="openRightMenu(item)"
+          @click="$store.commit('openRightMenu', item)"
         >
           <div
             @dragstart="onDrug($event, item, items)"
@@ -24,14 +24,10 @@
             </div>
           </div>
         </div>
-        <ModalItem
-          @closeModal="closeModal"
-          @delete="deleteCount"
-          :openModalWindow="openModalWindow"
-        />
+        <ModalItem @delete="deleteCount" />
         <div
-          v-if="fullItemOpen"
-          :class="{ openRight: fullItemOpen }"
+          v-if="$store.state.openRightModel"
+          :class="{ openRight: $store.state.openRightModel }"
           class="right-menu"
         >
           <div class="cross-div">
@@ -39,10 +35,10 @@
               class="cross"
               src="../src/sourse/icons/cross.svg"
               alt="image"
-              @click="fullClose"
+              @click="$store.commit('closeRightModel')"
             />
           </div>
-          <img :src="ClickElement?.img" alt="image" />
+          <img :src="$store.state.clickElement?.img" alt="image" />
           <div class="line"></div>
           <h2>Lorem ipsum, dolor.</h2>
           <p>
@@ -50,7 +46,9 @@
             error illo proiivident constetur porro pariatur suutreyh.
           </p>
           <div class="line"></div>
-          <button @click="openModal">Удалить предмет</button>
+          <button @click="$store.commit('openBottomModal')">
+            Удалить предмет
+          </button>
         </div>
       </div>
     </div>
@@ -65,30 +63,8 @@ import ModalItem from './components/UI/ModalItem.vue';
 import { ref } from 'vue';
 
 export default {
-  data() {
-    return {
-      fullItemOpen: false,
-      ClickElement: {},
-      openModalWindow: false,
-    };
-  },
-
   components: { SideBar, GhostElement, ModalItem },
   methods: {
-    openRightMenu(item) {
-      this.fullItemOpen = true;
-      this.ClickElement = item;
-    },
-    fullClose() {
-      this.fullItemOpen = false;
-      this.openModalWindow = false;
-    },
-    openModal() {
-      this.openModalWindow = true;
-    },
-    closeModal() {
-      this.openModalWindow = false;
-    },
     deleteCount(count) {
       this.items.forEach((el, i) => {
         if (el === this.ClickElement) {
@@ -96,7 +72,7 @@ export default {
         }
       });
       this.openModalWindow = false;
-      this.fullItemOpen = false;
+      $store.state.openRightModel = false;
     },
   },
 
@@ -296,16 +272,3 @@ export default {
   }
 }
 </style>
-
-<!-- РАБОЧИЙ
-
-if (itemId != dropId) {
-        [items.value[itemId - 1], items.value[dropId - 1]] = [
-          items.value[dropId - 1],
-          items.value[itemId - 1],
-        ];
-        [items.value[itemId - 1].id, items.value[dropId - 1].id] = [
-          items.value[dropId - 1].id,
-          items.value[itemId - 1].id,
-        ];
-      } -->

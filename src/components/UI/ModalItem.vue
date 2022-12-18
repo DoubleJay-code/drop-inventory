@@ -1,8 +1,12 @@
 <template>
-  <div :class="{ open: openModalWindow }" class="modal">
+  <div :class="{ open: $store.state.openBottomModel }" class="modal">
     <input v-model="count" placeholder="Введите количество" type="text" />
-    <button @click="$emit('closeModal', false)" class="white">Отмена</button>
-    <button @click="$emit('delete', count)" class="red">Подтвердить</button>
+    <button @click="$store.commit('closeBottomModal')" class="white">
+      Отмена
+    </button>
+    <button @click="$store.commit('closeBottomModal')" class="red">
+      Подтвердить
+    </button>
   </div>
 </template>
 
@@ -13,10 +17,6 @@ export default {
       count: 0,
     };
   },
-  props: {
-    openModalWindow: Boolean,
-  },
-  methods: {},
 };
 </script>
 
