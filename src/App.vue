@@ -3,53 +3,20 @@
     <div class="flex">
       <SideBar />
       <div class="inventory">
-        <div
-          v-for="item in items"
-          :key="item?.id"
-          class="inventory__elem droppable"
-          @drop="onDrop($event)"
-          @dragover.prevent
-          @dragenter.prevent
-          @click="$store.commit('openRightMenu', item)"
-        >
-          <div
-            @dragstart="onDrug($event, item, items)"
-            v-if="item?.img"
-            class="conteiner draggable"
-            draggable="true"
-          >
-            <img :src="item.img" alt="item-image" />
-            <div v-if="item.count" class="inventory__count">
-              {{ item.count }}
-            </div>
-          </div>
-        </div>
-        <ModalItem @delete="deleteCount" />
-        <div
-          v-if="$store.state.openRightModel"
-          :class="{ openRight: $store.state.openRightModel }"
-          class="right-menu"
-        >
-          <div class="cross-div">
-            <img
-              class="cross"
-              src="../src/sourse/icons/cross.svg"
-              alt="image"
-              @click="$store.commit('closeRightModel')"
-            />
-          </div>
-          <img :src="$store.state.clickElement?.img" alt="image" />
-          <div class="line"></div>
-          <h2>Lorem ipsum, dolor.</h2>
-          <p>
-            Lorem ipsum, dolor amet consectetur sitt adisiciing elit. Officia
-            error illo proiivident constetur porro pariatur suutreyh.
-          </p>
-          <div class="line"></div>
-          <button @click="$store.commit('openBottomModal')">
-            Удалить предмет
-          </button>
-        </div>
+        <InventoryElement
+          :items="this.items"
+          @ondrop="onDrop"
+          @ondrag="onDrag"
+        />
+        <ModalItem
+          @delete="
+            () => {
+              deleteCount(count);
+              $store.commit('closeRightModel');
+            }
+          "
+        />
+        <ModelRight />
       </div>
     </div>
     <GhostElement />
@@ -60,19 +27,32 @@
 import SideBar from './components/SideBar.vue';
 import GhostElement from './components/GhostElement.vue';
 import ModalItem from './components/UI/ModalItem.vue';
+import ModelRight from './components/ModelRight.vue';
+import InventoryElement from './components/InventoryElement.vue';
 import { ref } from 'vue';
 
 export default {
-  components: { SideBar, GhostElement, ModalItem },
+  data() {
+    return {
+      clickElem: this.$store.state.clickElement,
+    };
+  },
+  components: {
+    SideBar,
+    GhostElement,
+    ModalItem,
+    ModelRight,
+    InventoryElement,
+  },
   methods: {
-    deleteCount(count) {
-      this.items.forEach((el, i) => {
-        if (el === this.ClickElement) {
-          this.items[i].count = this.items[i].count - count;
+    deleteCount() {
+      this.items = this.items.map((el, i) => {
+        if (el === this.$store.state.clickElement) {
+          return { ...el, count: el.count - this.$store.state.inputCount };
+        } else {
+          return el;
         }
       });
-      this.openModalWindow = false;
-      $store.state.openRightModel = false;
     },
   },
 
@@ -105,7 +85,7 @@ export default {
       { id: 25 },
     ]);
 
-    function onDrug(event, item) {
+    function onDrag(event, item) {
       event.dataTransfer.dropEffect = 'move';
       event.dataTransfer.effectAllowed = 'move';
       event.dataTransfer.setData('itemId', item.id.toString());
@@ -125,7 +105,7 @@ export default {
     }
     return {
       items,
-      onDrug,
+      onDrag,
       onDrop,
     };
   },
@@ -168,107 +148,5 @@ export default {
   flex-wrap: wrap;
   overflow: hidden;
   position: relative;
-  .inventory__elem {
-    width: 20%;
-    height: 20%;
-    border: 1px solid #4d4d4d;
-    position: relative;
-    .inventory__count {
-      width: 16px;
-      height: 16px;
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      font-family: 'Inter';
-      font-weight: 500;
-      font-size: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #ffffff;
-      opacity: 0.4;
-      border: 1px solid #4d4d4d;
-      border-radius: 6px 0px 0px 0px;
-    }
-  }
-  .conteiner {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-  }
-}
-.right-menu {
-  width: 250px;
-  height: 500px;
-  position: absolute;
-  right: -250px;
-  top: 0;
-  background: rgba(38, 38, 38, 0.5);
-  border-left: 1px solid #4d4d4d;
-  backdrop-filter: blur(8px);
-  color: #ffffff;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 15px;
-  .cross-div {
-    display: flex;
-    justify-content: end;
-    width: 100%;
-    .cross {
-      width: 12px;
-      cursor: pointer;
-      margin-bottom: 24px;
-    }
-  }
-  img {
-    width: 130px;
-    margin-bottom: 30px;
-  }
-  .line {
-    width: 220px;
-    height: 1px;
-    background: #4d4d4d;
-    margin-bottom: 16px;
-  }
-  h2 {
-    width: 190px;
-    height: 26px;
-    font-size: 18px;
-    border-radius: 8px;
-    text-align: center;
-    padding-top: 4px;
-    margin-bottom: 20px;
-    opacity: 0.4;
-  }
-  p {
-    text-align: center;
-    line-height: 30px;
-    font-size: 14px;
-    opacity: 0.4;
-  }
-  button {
-    width: 220px;
-    height: 39px;
-    background: #fa7272;
-    border-radius: 8px;
-    font-family: 'Inter';
-    font-size: 14px;
-    color: #ffffff;
-  }
-}
-.openRight {
-  animation: open 1s ease-in-out both;
-}
-@keyframes open {
-  0% {
-    right: -250px;
-  }
-  100% {
-    right: 0;
-  }
 }
 </style>
