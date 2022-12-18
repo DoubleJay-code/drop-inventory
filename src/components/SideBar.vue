@@ -1,6 +1,6 @@
 <template>
   <div class="side-bar">
-    <img src="@/sourse/sideBar-img.png" alt="image" />
+    <img src="@/sourse/castle.jpg" alt="image" />
     <h2>Lorem ipsum, dolor.</h2>
     <p>
       Lorem ipsum, dolor amet consectetur sitt adisiciing elit. Officia error
@@ -27,6 +27,9 @@ export default {};
   color: #ffffff;
   img {
     margin-bottom: 20px;
+    height: 240px;
+    width: 100%;
+    object-fit: cover;
   }
   h2 {
     width: 190px;

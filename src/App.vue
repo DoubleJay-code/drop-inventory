@@ -58,9 +58,9 @@ export default {
 
   setup() {
     const items = ref([
-      { id: 1, img: require('../src/sourse/item1.png'), count: 4 },
-      { id: 2, img: require('../src/sourse/item2.png'), count: 2 },
-      { id: 3, img: require('../src/sourse/item3.png'), count: 5 },
+      { id: 1, img: require('../src/sourse/meat.png'), count: 4 },
+      { id: 2, img: require('../src/sourse/sword_icon.png'), count: 2 },
+      { id: 3, img: require('../src/sourse/gold_Ingot.png'), count: 5 },
       { id: 4 },
       { id: 5 },
       { id: 6 },

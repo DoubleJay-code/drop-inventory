@@ -1,12 +1,18 @@
 <template>
   <div class="ghost">
     <input type="text" />
-    <img src="@/sourse/icons/cross.svg" alt="cross" />
+    <img @click="clearStore" src="@/sourse/icons/cross.svg" alt="cross" />
   </div>
 </template>
 
 <script>
-export default {};
+export default {
+  methods: {
+    clearStore() {
+      localStorage.clear();
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
